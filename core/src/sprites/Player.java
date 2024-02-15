@@ -26,11 +26,12 @@ public class Player extends Sprite {
     private int playerStatus = IDLE;
     private int previousStatus = IDLE;
     public static final float ANIMATION_DELAY = .3f;
+    public static final int PLAYER_SPEED_X = 3;
     private int aniIndex;
 
     public Player(World world, GameScreen screen, String name) {
-        texture = new Texture("2.png");
-        parseJson = new ParseJson("2.json");
+        texture = new Texture(name +".png");
+        parseJson = new ParseJson(name +".json");
         spriteFrame = parseJson.getSpriteFrame();
         int i = 0;
         textureRegions = new TextureRegion[spriteFrame.frames.size()];
@@ -40,7 +41,7 @@ public class Player extends Sprite {
         }
         this.world = world;
         definePlayer();
-        setBounds(0, 0, 64 / CatGame.PPM, 64 / CatGame.PPM);
+        setBounds(0, 0, 32 / CatGame.PPM, 32 / CatGame.PPM);
 
     }
 
@@ -108,7 +109,7 @@ public class Player extends Sprite {
         b2body = world.createBody(bdef);
         FixtureDef fdef = new FixtureDef();
         CircleShape shape = new CircleShape();
-        shape.setRadius(30 / CatGame.PPM);
+        shape.setRadius(15 / CatGame.PPM);
         fdef.shape = shape;
         b2body.createFixture(fdef);
 

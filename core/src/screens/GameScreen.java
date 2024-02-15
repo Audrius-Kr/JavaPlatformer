@@ -39,7 +39,6 @@ public class GameScreen implements Screen {
 
     public GameScreen(CatGame game){
         this.game = game;
-        //texture = new Texture("GerasBackground.png");
         gameCamera = new OrthographicCamera();
         gamePort = new FitViewport(CatGame.SCREEN_WIDTH / CatGame.PPM, CatGame.SCREEN_HEIGHT / CatGame.PPM, gameCamera);
         mapLoader = new TmxMapLoader();
@@ -48,9 +47,8 @@ public class GameScreen implements Screen {
         gameCamera.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight()/2, 0);
         world = new World(new Vector2(0,-10), true );
         b2dr = new Box2DDebugRenderer();
-        player = new Player(world, this, "1");
+        player = new Player(world, this, "2");
         new B2WorldCreator(world, map);
-        atlas = new TextureAtlas("Player.atlas");
     }
     public TextureAtlas getAtlas() {
         return atlas;
@@ -63,9 +61,9 @@ public class GameScreen implements Screen {
     public void handleInput(float dt) {
         if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
             player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= 2)
+        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= player.PLAYER_SPEED_X)
             player.b2body.applyLinearImpulse(new Vector2(1f, 0),player.b2body.getWorldCenter(), true);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -2)
+        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -(player.PLAYER_SPEED_X))
             player.b2body.applyLinearImpulse(new Vector2(-1f, 0),player.b2body.getWorldCenter(), true);
 
     }
