@@ -15,33 +15,19 @@ import java.util.List;
 
 import static utils.Constants.PlayerConstants.*;
 
-public class Player extends Sprite {
-    public World world;
-    public Body b2body;
-    ParseJson parseJson;
-    SpriteFrame spriteFrame;
-    TextureRegion[] textureRegions;
-    Texture texture;
+public class Player extends Entity {
+
+
     private float elapsedTime = 0;
     private int playerStatus = IDLE;
     private int previousStatus = IDLE;
     public static final float ANIMATION_DELAY = .3f;
     public static final int PLAYER_SPEED_X = 3;
     private int aniIndex;
+    private boolean dead;
 
-    public Player(World world, GameScreen screen, String name) {
-        texture = new Texture(name +".png");
-        parseJson = new ParseJson(name +".json");
-        spriteFrame = parseJson.getSpriteFrame();
-        int i = 0;
-        textureRegions = new TextureRegion[spriteFrame.frames.size()];
-        for (SpriteFrame.Frame frame : spriteFrame.frames) {
-            textureRegions[i] = new TextureRegion(texture, frame.frameDetails.x, frame.frameDetails.y, frame.frameDetails.w, frame.frameDetails.h);
-            i++;
-        }
-        this.world = world;
-        definePlayer();
-        setBounds(0, 0, 32 / CatGame.PPM, 32 / CatGame.PPM);
+    public Player(World world, GameScreen screen, float x, float y) {
+        super(world, "2", x / CatGame.PPM, y / CatGame.PPM);
 
     }
 
@@ -87,36 +73,17 @@ public class Player extends Sprite {
             if (previousStatus != playerStatus) {
                 aniIndex = 0;
             }
+        }
+
+            setRegion(textureRegions[playerStatus + aniIndex]);
+            if (elapsedTime >= ANIMATION_DELAY) {
+                elapsedTime = 0;
+                aniIndex++;
+                if ((aniIndex + playerStatus >= Constants.PlayerConstants.getSpriteAmount(playerStatus)) || (aniIndex + playerStatus >= textureRegions.length))
+                    aniIndex = 0;
+            }
 
         }
-        setRegion(textureRegions[playerStatus+aniIndex]);
-        if(elapsedTime >= ANIMATION_DELAY) {
-            elapsedTime = 0;
-            aniIndex++;
-            if ((aniIndex+playerStatus >= Constants.PlayerConstants.getSpriteAmount(playerStatus)) || (aniIndex+playerStatus >=textureRegions.length))
-                aniIndex =0;
-        }
-        System.out.println(aniIndex);
-
-
-    }
-
-    public void definePlayer() {
-        BodyDef bdef = new BodyDef();
-        bdef.position.set(100 / CatGame.PPM, 100 / CatGame.PPM);
-        bdef.type = BodyDef.BodyType.DynamicBody;
-        b2body = world.createBody(bdef);
-        b2body = world.createBody(bdef);
-        FixtureDef fdef = new FixtureDef();
-        CircleShape shape = new CircleShape();
-        shape.setRadius(15 / CatGame.PPM);
-        fdef.shape = shape;
-        b2body.createFixture(fdef);
-
     }
 
 
-
-
-
-}

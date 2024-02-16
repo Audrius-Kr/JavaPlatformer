@@ -2,9 +2,10 @@ package utils;
 
 public class Constants {
     public static class PlayerConstants{
+        public static final int DEAD = 8;
         public static final int RUNNING_RIGHT = 3;
         public static final int RUNNING_LEFT = 5;
-        public static final int IDLE = 0;
+        public static final int IDLE = 1;
         public static final int JUMPING = 8;
         public static final int  FALLING = 9;
         public static final int CROUCH = 7;

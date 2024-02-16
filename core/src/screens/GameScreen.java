@@ -8,34 +8,36 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.CatGame;
+import sprites.Entity;
+import sprites.FinalCat;
 import sprites.Player;
-
-import static utils.Constants.PlayerConstants.*;
 
 public class GameScreen implements Screen {
     Texture texture;
     private OrthographicCamera gameCamera;
     private Viewport gamePort;
     private CatGame game;
+    TextureRegion idleFrame;
     private TmxMapLoader mapLoader;
     private TiledMap map;
+    private B2WorldCreator creator;
     private OrthogonalTiledMapRenderer renderer;
     private World world;
     private Box2DDebugRenderer b2dr;
     private Player player;
-    TextureAtlas atlas;
+
+
 
     public GameScreen(CatGame game){
         this.game = game;
@@ -47,12 +49,11 @@ public class GameScreen implements Screen {
         gameCamera.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight()/2, 0);
         world = new World(new Vector2(0,-10), true );
         b2dr = new Box2DDebugRenderer();
-        player = new Player(world, this, "2");
-        new B2WorldCreator(world, map);
+        player = new Player(world, this, 100, 100);
+        creator = new B2WorldCreator(this);
+
     }
-    public TextureAtlas getAtlas() {
-        return atlas;
-    }
+
 
     @Override
     public void show() {
@@ -61,9 +62,9 @@ public class GameScreen implements Screen {
     public void handleInput(float dt) {
         if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
             player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= player.PLAYER_SPEED_X)
+        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= Player.PLAYER_SPEED_X)
             player.b2body.applyLinearImpulse(new Vector2(1f, 0),player.b2body.getWorldCenter(), true);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -(player.PLAYER_SPEED_X))
+        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -(Player.PLAYER_SPEED_X))
             player.b2body.applyLinearImpulse(new Vector2(-1f, 0),player.b2body.getWorldCenter(), true);
 
     }
@@ -71,7 +72,10 @@ public class GameScreen implements Screen {
         handleInput(dt);
         world.step(1/60f, 6, 2);
         player.update(dt);
+        for (FinalCat entity : creator.getFinalCats()) {
+            entity.update(dt);
 
+        }
         gameCamera.position.x = player.b2body.getPosition().x;
         gameCamera.update();
         renderer.setView(gameCamera);
@@ -88,9 +92,24 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(gameCamera.combined);
         game.batch.begin();
         player.draw(game.batch);
+        for (FinalCat entity : creator.getFinalCats()){
+            idleFrame = entity.getIdleFrame();
+            float x = entity.getX();
+            float y = entity.getY();
+            float w = idleFrame.getRegionWidth();
+            float h = idleFrame.getRegionHeight();
+            game.batch.draw(idleFrame,x,y,w / CatGame.PPM,h/ CatGame.PPM);
+
+        }
         game.batch.end();
 
 
+    }
+    public World getWorld() {
+        return this.world;
+    }
+    public TiledMap getMap() {
+        return this.map;
     }
 
     @Override
