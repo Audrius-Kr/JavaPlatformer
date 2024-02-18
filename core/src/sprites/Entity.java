@@ -58,7 +58,9 @@ public abstract class Entity extends Sprite {
         CircleShape shape = new CircleShape();
         shape.setRadius(CIRCLE_RADIUS / CatGame.PPM);
         fdef.shape = shape;
-        b2body.createFixture(fdef);
+        b2body.createFixture(fdef).setUserData(this);
+
+
 
 
     }

@@ -1,6 +1,7 @@
 package screens;
 
 import Tools.B2WorldCreator;
+import Tools.WorldListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -24,7 +25,7 @@ import sprites.FinalCat;
 import sprites.Player;
 
 public class GameScreen implements Screen {
-    Texture texture;
+
     private OrthographicCamera gameCamera;
     private Viewport gamePort;
     private CatGame game;
@@ -36,6 +37,8 @@ public class GameScreen implements Screen {
     private World world;
     private Box2DDebugRenderer b2dr;
     private Player player;
+    private float deadTimer = 0;
+
 
 
 
@@ -51,6 +54,12 @@ public class GameScreen implements Screen {
         b2dr = new Box2DDebugRenderer();
         player = new Player(world, this, 100, 100);
         creator = new B2WorldCreator(this);
+        world.setContactListener(new WorldListener());
+
+
+
+
+
 
     }
 
@@ -60,50 +69,57 @@ public class GameScreen implements Screen {
 
     }
     public void handleInput(float dt) {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
-            player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= Player.PLAYER_SPEED_X)
-            player.b2body.applyLinearImpulse(new Vector2(1f, 0),player.b2body.getWorldCenter(), true);
-        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -(Player.PLAYER_SPEED_X))
-            player.b2body.applyLinearImpulse(new Vector2(-1f, 0),player.b2body.getWorldCenter(), true);
-
+        if (!player.dead){
+            if (Gdx.input.isKeyJustPressed(Input.Keys.UP))
+                player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= Player.PLAYER_SPEED_X)
+                player.b2body.applyLinearImpulse(new Vector2(1f, 0), player.b2body.getWorldCenter(), true);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -(Player.PLAYER_SPEED_X))
+                player.b2body.applyLinearImpulse(new Vector2(-1f, 0), player.b2body.getWorldCenter(), true);
+        }
     }
     public void update(float dt) {
-        handleInput(dt);
-        world.step(1/60f, 6, 2);
-        player.update(dt);
-        for (FinalCat entity : creator.getFinalCats()) {
-            entity.update(dt);
 
+            handleInput(dt);
+            world.step(1 / 60f, 6, 2);
+            player.update(dt);
+            for (FinalCat entity : creator.getFinalCats()) {
+                entity.update(dt);
+
+            }
+        if(!player.dead) {
+            gameCamera.position.x = player.b2body.getPosition().x;
+            gameCamera.update();
+            renderer.setView(gameCamera);
         }
-        gameCamera.position.x = player.b2body.getPosition().x;
-        gameCamera.update();
-        renderer.setView(gameCamera);
+
     }
 
     @Override
     public void render(float delta) {
-        update(delta);
-        Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        renderer.render();
-        game.batch.setProjectionMatrix(gameCamera.combined);
-        b2dr.render(world, gameCamera.combined);
-        game.batch.setProjectionMatrix(gameCamera.combined);
-        game.batch.begin();
-        player.draw(game.batch);
-        for (FinalCat entity : creator.getFinalCats()){
-            idleFrame = entity.getIdleFrame();
-            float x = entity.getX();
-            float y = entity.getY();
-            float w = idleFrame.getRegionWidth();
-            float h = idleFrame.getRegionHeight();
-            game.batch.draw(idleFrame,x,y,w / CatGame.PPM,h/ CatGame.PPM);
 
-        }
-        game.batch.end();
-
-
+            update(delta);
+            Gdx.gl.glClearColor(0, 0, 0, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            renderer.render();
+            game.batch.setProjectionMatrix(gameCamera.combined);
+            b2dr.render(world, gameCamera.combined);
+            game.batch.setProjectionMatrix(gameCamera.combined);
+            game.batch.begin();
+            player.draw(game.batch);
+            for (FinalCat entity : creator.getFinalCats()) {
+                idleFrame = entity.getIdleFrame();
+                float x = entity.getX();
+                float y = entity.getY();
+                float w = idleFrame.getRegionWidth();
+                float h = idleFrame.getRegionHeight();
+                game.batch.draw(idleFrame, x, y, w / CatGame.PPM, h / CatGame.PPM);
+            }
+            game.batch.end();
+            if(player.dead)
+                deadTimer += delta;
+            if(deadTimer >= 3)
+                game.setScreen(new GameOverScreen(game));
     }
     public World getWorld() {
         return this.world;
@@ -129,15 +145,17 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-
+        dispose();
     }
 
     @Override
     public void dispose() {
         map.dispose();
+
         renderer.dispose();
         world.dispose();
         b2dr.dispose();
+
 
 
     }

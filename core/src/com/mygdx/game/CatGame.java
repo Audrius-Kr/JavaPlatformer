@@ -8,6 +8,9 @@ public class CatGame extends Game {
 	public static final int SCREEN_WIDTH = 1280;
 	public static final int SCREEN_HEIGHT = 800;
 	public static final float PPM = 100;
+	public static final short CATEGORY_NOTHING = 0;
+	public static final short CATEGORY_PLAYER = 1;
+
 	public SpriteBatch batch;
 
 	

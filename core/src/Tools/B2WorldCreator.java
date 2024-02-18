@@ -34,12 +34,24 @@ public class B2WorldCreator {
             body = world.createBody(bdef);
             shape.setAsBox(rect.getWidth() / 2 / CatGame.PPM, rect.getHeight() / 2 / CatGame.PPM);
             fdef.shape = shape;
-            body.createFixture(fdef);
+            body.createFixture(fdef).setUserData("Ground");
         }
+        for (RectangleMapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)){
+            Rectangle rect = object. getRectangle();
+            bdef.type = BodyDef.BodyType.StaticBody;
+            bdef.position.set((rect.getX() + rect.getWidth() / 2) / CatGame.PPM, (rect.getY() + rect.getHeight() / 2) / CatGame.PPM);
+            body = world.createBody(bdef);
+            shape.setAsBox(rect.getWidth() / 2 / CatGame.PPM, rect.getHeight() / 2 / CatGame.PPM);
+            fdef.shape = shape;
+            body.createFixture(fdef).setUserData("Spikes");
+
+        }
+
+
         finalCats = new Array<>();
-        for(RectangleMapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)){
+        for(RectangleMapObject object : map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)){
             Rectangle rect = object.getRectangle();
-            finalCats .add(new FinalCat(world,screen, rect.getX() /2/CatGame.PPM, rect.getY() /2/ CatGame.PPM));
+            finalCats .add(new FinalCat(world,screen, rect.getX() /CatGame.PPM, rect.getY() / CatGame.PPM));
 
         }
     }

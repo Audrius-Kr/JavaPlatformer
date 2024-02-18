@@ -14,6 +14,7 @@ public class FinalCat extends Entity {
     public FinalCat(World world, GameScreen screen, float  x, float y) {
         super(world, "smallNiceCat", x, y);
         this.idleAnimation = new Animation<TextureRegion>(0.8f, textureRegions);
+        fdef.isSensor = true;
 
     }
 
