@@ -7,20 +7,22 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
+
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.CatGame;
-import sprites.Entity;
+
 import sprites.FinalCat;
 import sprites.Player;
 
@@ -88,9 +90,13 @@ public class GameScreen implements Screen {
 
             }
         if(!player.dead) {
+
             gameCamera.position.x = player.b2body.getPosition().x;
             gameCamera.update();
             renderer.setView(gameCamera);
+
+
+
         }
 
     }
@@ -98,28 +104,29 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
 
-            update(delta);
-            Gdx.gl.glClearColor(0, 0, 0, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            renderer.render();
-            game.batch.setProjectionMatrix(gameCamera.combined);
-            b2dr.render(world, gameCamera.combined);
-            game.batch.setProjectionMatrix(gameCamera.combined);
-            game.batch.begin();
-            player.draw(game.batch);
-            for (FinalCat entity : creator.getFinalCats()) {
-                idleFrame = entity.getIdleFrame();
-                float x = entity.getX();
-                float y = entity.getY();
-                float w = idleFrame.getRegionWidth();
-                float h = idleFrame.getRegionHeight();
-                game.batch.draw(idleFrame, x, y, w / CatGame.PPM, h / CatGame.PPM);
-            }
-            game.batch.end();
-            if(player.dead)
-                deadTimer += delta;
-            if(deadTimer >= 3)
-                game.setScreen(new GameOverScreen(game));
+        update(delta);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        renderer.render();
+        game.batch.setProjectionMatrix(gameCamera.combined);
+        b2dr.render(world, gameCamera.combined);
+        game.batch.setProjectionMatrix(gameCamera.combined);
+        game.batch.begin();
+        player.draw(game.batch);
+        for (FinalCat entity : creator.getFinalCats()) {
+            idleFrame = entity.getIdleFrame();
+            float x = entity.getX();
+            float y = entity.getY();
+            float w = idleFrame.getRegionWidth();
+            float h = idleFrame.getRegionHeight();
+            game.batch.draw(idleFrame, x, y, w / CatGame.PPM, h / CatGame.PPM);
+        }
+        game.batch.end();
+        if (player.dead)
+            deadTimer += delta;
+        if (deadTimer >= 3) {
+            game.setScreen(new GameOverScreen(game));
+        }
     }
     public World getWorld() {
         return this.world;
@@ -151,7 +158,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         map.dispose();
-
         renderer.dispose();
         world.dispose();
         b2dr.dispose();

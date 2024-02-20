@@ -38,7 +38,7 @@ public class Player extends Entity {
         elapsedTime += dt;
         setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 2);
         if (!dead) {
-            if (b2body.getLinearVelocity().y < 0 && previousStatus != JUMPING) {
+            if (b2body.getLinearVelocity().y < 0 ) {
                 previousStatus = playerStatus;
                 playerStatus = FALLING;
                 if (previousStatus != playerStatus) {

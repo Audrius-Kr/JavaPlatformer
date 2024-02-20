@@ -1,8 +1,11 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import screens.GameScreen;
+import screens.MenuScreen;
 
 public class CatGame extends Game {
 	public static final int SCREEN_WIDTH = 1280;
@@ -17,7 +20,13 @@ public class CatGame extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new GameScreen(this));
+		setScreen(new MenuScreen(this));
+	}
+	public static float getScreenWidth() {
+		return Gdx.graphics.getWidth();
+	}
+	public static float getScreenHeight() {
+		return Gdx.graphics.getHeight();
 	}
 
 	@Override
