@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     public GameScreen(CatGame game){
         this.game = game;
         gameCamera = new OrthographicCamera();
-        gamePort = new FitViewport(CatGame.SCREEN_WIDTH / CatGame.PPM, CatGame.SCREEN_HEIGHT / CatGame.PPM, gameCamera);
+        gamePort = new StretchViewport(CatGame.SCREEN_WIDTH / CatGame.PPM, CatGame.SCREEN_HEIGHT / CatGame.PPM, gameCamera);
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("tiled/map1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map,1 / CatGame.PPM);
