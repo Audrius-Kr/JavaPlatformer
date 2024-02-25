@@ -1,7 +1,9 @@
 package Tools;
 
 import com.badlogic.gdx.physics.box2d.*;
+import sprites.Entity;
 import sprites.Player;
+import sprites.Sensor;
 
 
 public class WorldListener implements ContactListener {
@@ -13,12 +15,38 @@ public class WorldListener implements ContactListener {
         if (fixA.getUserData()  instanceof Player || fixB.getUserData()  instanceof Player) {
             Fixture player = fixA.getUserData() instanceof Player ? fixA : fixB;
             Fixture object = player == fixA ? fixB : fixA;
-System.out.println("Player");
+
             if(object.getUserData() != null && object.getUserData().equals("Spikes")){
-                System.out.println("Spike");
+
                 ((Player) player.getUserData()).playerDead();
             }
         }
+/*
+            if ((fixA.getUserData() instanceof Sensor && ((((Sensor) fixA.getUserData()).sensorId.equals("Right")) && ((Sensor)fixA.getUserData()).name.equals("Player"))) || (fixA.getUserData() instanceof Sensor && (((((Sensor) fixA.getUserData())).sensorId.equals("Left")) && ((Sensor)fixA.getUserData()).name.equals("Player")))
+                                                                                            ||
+                    (fixB.getUserData() instanceof Sensor && (((((Sensor) fixB.getUserData())).sensorId.equals("Left")) && ((Sensor)fixB.getUserData()).name.equals("Player"))) || (fixB.getUserData() instanceof Sensor && (((((Sensor) fixB.getUserData())).sensorId.equals("Right")) && ((Sensor)fixB.getUserData()).name.equals("Player")))) {
+                Fixture player = fixA.getUserData() instanceof Sensor ? fixA : fixB;
+                Fixture object = player == fixA ? fixB : fixA;
+                if(object.getUserData() != null && object.getUserData().equals("Ground")){
+
+                    ((Player) player.getUserData()).setXVelocity(0);
+                }
+            }
+
+        if ((fixA.getUserData() instanceof Sensor && (((((Sensor) fixA.getUserData())).sensorId.equals("Bottom")) && ((Sensor)fixA.getUserData()).name.equals("Player"))) || (fixB.getUserData() instanceof Sensor && ((((Sensor) fixA.getUserData())).sensorId.equals("Bottom")) && ((Sensor)fixB.getUserData()).name.equals("Player"))) {
+            Fixture player = fixA.getUserData() instanceof Sensor ? fixA : fixB;
+            Fixture object = player == fixA ? fixB : fixA;
+
+            if(object.getUserData() != null && !(object.getUserData().equals("Ground"))){
+
+                ((Player) player.getUserData()).addExtraGravity();
+            }
+        }
+
+
+
+ */
+
     }
 
     @Override

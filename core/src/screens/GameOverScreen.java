@@ -1,6 +1,8 @@
 package screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -34,6 +36,9 @@ public class GameOverScreen implements Screen {
     public void show() {
 
     }
+    private void update() {
+        changeScreen();
+    }
 
     @Override
     public void render(float v) {
@@ -60,6 +65,15 @@ public class GameOverScreen implements Screen {
 
         // Restore the old projection matrix
         game.batch.setProjectionMatrix(oldProjection);
+        update();
+    }
+    private void changeScreen() {
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            game.setScreen(new GameScreen(this.game));
+        }
+        if(Gdx.input.isTouched()) {
+            game.setScreen(new MenuScreen(this.game));
+        }
     }
 
     @Override

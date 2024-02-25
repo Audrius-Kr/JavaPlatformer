@@ -1,6 +1,8 @@
 package sprites;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -25,11 +27,11 @@ public class Player extends Entity {
     private int playerStatus = IDLE;
     private int previousStatus = IDLE;
     public static final float ANIMATION_DELAY = .3f;
-    public static final int PLAYER_SPEED_X = 3;
+    public static final float PLAYER_SPEED_X = 1.0f;
     private int aniIndex;
     public boolean dead = false;
 
-    public Player(World world, GameScreen screen, float x, float y) {
+    public Player(World world, float x, float y) {
         super(world, "2", x / CatGame.PPM, y / CatGame.PPM);
 
     }
@@ -37,8 +39,11 @@ public class Player extends Entity {
     public void update(float dt) {
         elapsedTime += dt;
         setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 2);
+        if((b2body.getPosition().y < 0) && !dead){
+            playerDead();
+        }
         if (!dead) {
-            if (b2body.getLinearVelocity().y < 0 ) {
+            if (b2body.getLinearVelocity().y < 0 && previousStatus != JUMPING) {
                 previousStatus = playerStatus;
                 playerStatus = FALLING;
                 if (previousStatus != playerStatus) {
@@ -54,7 +59,7 @@ public class Player extends Entity {
                 }
 
             }
-            if (b2body.getLinearVelocity().x == 0 && b2body.getLinearVelocity().y == 0) {
+            if (b2body.getLinearVelocity().x == 0 && b2body.getLinearVelocity().y == 0 && b2body.getLinearVelocity().x <= .5f) {
                 previousStatus = playerStatus;
                 playerStatus = IDLE;
                 if (previousStatus != playerStatus) {
@@ -62,7 +67,7 @@ public class Player extends Entity {
                 }
 
             }
-            if (b2body.getLinearVelocity().x > 0 && b2body.getLinearVelocity().y == 0) {
+            if (b2body.getLinearVelocity().x > 0 && b2body.getLinearVelocity().y <= 0.5f) {
                 previousStatus = playerStatus;
                 playerStatus = RUNNING_RIGHT;
                 if (previousStatus != playerStatus) {
@@ -70,7 +75,7 @@ public class Player extends Entity {
                 }
 
             }
-            if (b2body.getLinearVelocity().x < 0 && b2body.getLinearVelocity().y == 0) {
+            if (b2body.getLinearVelocity().x < 0 && b2body.getLinearVelocity().y <= 0.5f) {
                 previousStatus = playerStatus;
                 playerStatus = RUNNING_LEFT;
                 if (previousStatus != playerStatus) {
@@ -88,6 +93,21 @@ public class Player extends Entity {
 
         }
     }
+    public void addExtraGravity() {
+        Vector2 velocity = b2body.getLinearVelocity();
+        velocity.y = GameScreen.GRAVITY_STRENGTH;
+        b2body.setLinearVelocity(velocity);
+    }
+    public void handleInput(float dt) {
+        if (!dead){
+            if ((Gdx.input.isKeyJustPressed(Input.Keys.UP)) && b2body.getLinearVelocity().y == 0)
+                b2body.applyLinearImpulse(new Vector2(0, 4f), b2body.getWorldCenter(), true);
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && b2body.getLinearVelocity().x <= Player.PLAYER_SPEED_X)
+                b2body.applyLinearImpulse(new Vector2(1f, 0), b2body.getWorldCenter(), true);
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && b2body.getLinearVelocity().x >= -(Player.PLAYER_SPEED_X))
+                b2body.applyLinearImpulse(new Vector2(-1f, 0), b2body.getWorldCenter(), true);
+        }
+    }
         public void playerDead() {
             this.dead = true;
             Filter filter = new Filter();
@@ -96,10 +116,15 @@ public class Player extends Entity {
                 fixture.setFilterData(filter);
             }
             flip(false, true);
-            b2body.applyLinearImpulse(new Vector2(0, 16f), b2body.getWorldCenter(), true);
+            b2body.applyLinearImpulse(new Vector2(0, 8f), b2body.getWorldCenter(), true);
 
 
 
+        }
+        public void setXVelocity (float velo){
+            Vector2 velocity = b2body.getLinearVelocity();
+            velocity.x = 0;
+            b2body.setLinearVelocity(velocity);
         }
     }
 

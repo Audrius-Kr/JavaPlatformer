@@ -15,6 +15,7 @@ import sprites.FinalCat;
 
 public class B2WorldCreator {
     private Array<FinalCat> finalCats;
+    private static final float FRICTION = 0.2f;
 
 
 
@@ -34,6 +35,7 @@ public class B2WorldCreator {
             body = world.createBody(bdef);
             shape.setAsBox(rect.getWidth() / 2 / CatGame.PPM, rect.getHeight() / 2 / CatGame.PPM);
             fdef.shape = shape;
+            fdef.friction = FRICTION;
             body.createFixture(fdef).setUserData("Ground");
         }
         for (RectangleMapObject object : map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)){

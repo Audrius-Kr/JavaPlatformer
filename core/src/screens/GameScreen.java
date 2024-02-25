@@ -32,9 +32,11 @@ import sprites.Player;
 public class GameScreen implements Screen {
 
     private final int BCGRD_LAYER_INDEX = 0;
+    public static final float GRAVITY_STRENGTH = -10f;
     private OrthographicCamera gameCamera;
     private Viewport gamePort;
     private CatGame game;
+    private boolean onGround;
     TextureRegion idleFrame;
     private TmxMapLoader mapLoader;
     private TiledMap map;
@@ -60,21 +62,14 @@ public class GameScreen implements Screen {
         map = mapLoader.load("tiled/map1.tmx");
         renderer = new OrthogonalTiledMapRenderer(map,1 / CatGame.PPM);
         gameCamera.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight()/2, 0);
-        world = new World(new Vector2(0,-10), true );
+        world = new World(new Vector2(0,GRAVITY_STRENGTH), true );
         b2dr = new Box2DDebugRenderer();
-        player = new Player(world, this, 100, 100);
+        player = new Player(world, 100, 100);
         creator = new B2WorldCreator(this);
         world.setContactListener(new WorldListener());
         backgroundLayer = (TiledMapImageLayer) map.getLayers().get(BCGRD_LAYER_INDEX);
         background = backgroundLayer.getTextureRegion();
-        repeatX = (int) Math.ceil(Gdx.graphics.getWidth() / (float) (background.getRegionWidth() / CatGame.PPM));
-        repeatY = (int) Math.ceil(Gdx.graphics.getHeight() / (float) background.getRegionHeight());
-
-
-
-
-
-
+        repeatX = (int) Math.ceil(Gdx.graphics.getWidth() /  (background.getRegionWidth() / CatGame.PPM));
 
     }
 
@@ -83,34 +78,27 @@ public class GameScreen implements Screen {
     public void show() {
 
     }
-    public void handleInput(float dt) {
-        if (!player.dead){
-            if (Gdx.input.isKeyJustPressed(Input.Keys.UP))
-                player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true);
-            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= Player.PLAYER_SPEED_X)
-                player.b2body.applyLinearImpulse(new Vector2(1f, 0), player.b2body.getWorldCenter(), true);
-            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -(Player.PLAYER_SPEED_X))
-                player.b2body.applyLinearImpulse(new Vector2(-1f, 0), player.b2body.getWorldCenter(), true);
-        }
-    }
+
     public void update(float dt) {
 
-            handleInput(dt);
+
             world.step(1 / 60f, 6, 2);
             player.update(dt);
+        player.handleInput(dt);
             for (FinalCat entity : creator.getFinalCats()) {
                 entity.update(dt);
 
             }
-        if(!player.dead) {
 
-            gameCamera.position.x = player.b2body.getPosition().x;
-            gameCamera.update();
-            renderer.setView(gameCamera);
+            if(!player.dead) {
+
+                gameCamera.position.x = player.b2body.getPosition().x;
+                gameCamera.update();
+                renderer.setView(gameCamera);
 
 
 
-        }
+            }
 
     }
 
@@ -126,9 +114,7 @@ public class GameScreen implements Screen {
 
 
         for (int x = 0; x < repeatX; x++) {
-
                 game.batch.draw(background, x * background.getRegionWidth() / CatGame.PPM, 0, background.getRegionWidth() / CatGame.PPM, background.getRegionHeight() / CatGame.PPM);
-
         }
 
         for (FinalCat entity : creator.getFinalCats()) {
@@ -142,8 +128,6 @@ public class GameScreen implements Screen {
         renderer.render();
         player.draw(game.batch);
         game.batch.end();
-
-
         b2dr.render(world, gameCamera.combined);
 
         if (player.dead)
@@ -152,6 +136,7 @@ public class GameScreen implements Screen {
             game.setScreen(new GameOverScreen(game));
         }
     }
+
     public World getWorld() {
         return this.world;
     }
