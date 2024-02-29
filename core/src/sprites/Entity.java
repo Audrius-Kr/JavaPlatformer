@@ -60,6 +60,7 @@ public abstract class Entity extends Sprite {
         bdef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bdef);
         fdef = new FixtureDef();
+        /*
         PolygonShape leftSideShape = new PolygonShape();
         leftSideShape.setAsBox(sensorWidth / 2, spriteSize / CatGame.PPM/2, new Vector2(-(spriteSize / CatGame.PPM) / 2, 1/CatGame.PPM), 0);
 
@@ -79,13 +80,15 @@ public abstract class Entity extends Sprite {
 System.out.println(this);
         b2body.createFixture(rightSideFixtureDef).setUserData(new Sensor(this, this.getClass().getSimpleName(), "Right"));
 
+         */
+
 
         PolygonShape mainShape =new PolygonShape();
         mainShape.setAsBox(spriteSize / CatGame.PPM/2,spriteSize / CatGame.PPM/2);
         FixtureDef mainFixture = new FixtureDef();
         mainFixture.shape = mainShape;
         b2body.createFixture(mainFixture).setUserData(this);
-
+        /*
         PolygonShape bottomSensor =new PolygonShape();
         bottomSensor.setAsBox(spriteSize / CatGame.PPM/2,0,new Vector2(0,-(spriteSize / CatGame.PPM/2) -1/CatGame.PPM ),0);
         FixtureDef bottomFixture = new FixtureDef();
@@ -93,6 +96,8 @@ System.out.println(this);
         bottomFixture.shape = bottomSensor;
         b2body.createFixture(bottomFixture).setUserData(new Sensor(this, this.getClass().getSimpleName(), "Bottom"));
 
+
+         */
 
 
 

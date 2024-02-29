@@ -1,3 +1,7 @@
+/* Audrius Kralikas
+
+ */
+
 package screens;
 
 import Tools.B2WorldCreator;
@@ -5,27 +9,24 @@ import Tools.WorldListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapImageLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
-import com.badlogic.gdx.utils.viewport.FillViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.CatGame;
 
+import screens.GameOverScreen;
 import sprites.FinalCat;
 import sprites.Player;
 
@@ -48,28 +49,30 @@ public class GameScreen implements Screen {
     TiledMapImageLayer backgroundLayer;
     TextureRegion background;
     private float deadTimer = 0;
-    int repeatY;
     int repeatX;
+    public Music main;
 
 
 
 
-    public GameScreen(CatGame game){
+    public GameScreen(CatGame game) {
         this.game = game;
         gameCamera = new OrthographicCamera();
         gamePort = new StretchViewport(CatGame.SCREEN_WIDTH / CatGame.PPM, CatGame.SCREEN_HEIGHT / CatGame.PPM, gameCamera);
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("tiled/map1.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map,1 / CatGame.PPM);
-        gameCamera.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight()/2, 0);
-        world = new World(new Vector2(0,GRAVITY_STRENGTH), true );
+        renderer = new OrthogonalTiledMapRenderer(map, 1 / CatGame.PPM);
+        gameCamera.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
+        world = new World(new Vector2(0, GRAVITY_STRENGTH), true);
         b2dr = new Box2DDebugRenderer();
         player = new Player(world, 100, 100);
         creator = new B2WorldCreator(this);
         world.setContactListener(new WorldListener());
         backgroundLayer = (TiledMapImageLayer) map.getLayers().get(BCGRD_LAYER_INDEX);
         background = backgroundLayer.getTextureRegion();
-        repeatX = (int) Math.ceil(Gdx.graphics.getWidth() /  (background.getRegionWidth() / CatGame.PPM));
+        repeatX = (int) Math.ceil(Gdx.graphics.getWidth() / (background.getRegionWidth() / CatGame.PPM));
+        main = Gdx.audio.newMusic(Gdx.files.internal("main.mp3"));
+        main.setLooping(true);
 
     }
 
@@ -80,6 +83,8 @@ public class GameScreen implements Screen {
     }
 
     public void update(float dt) {
+        main.setVolume(0.1f);
+        main.play();
 
 
             world.step(1 / 60f, 6, 2);
@@ -95,10 +100,8 @@ public class GameScreen implements Screen {
                 gameCamera.position.x = player.b2body.getPosition().x;
                 gameCamera.update();
                 renderer.setView(gameCamera);
-
-
-
             }
+
 
     }
 
@@ -128,12 +131,15 @@ public class GameScreen implements Screen {
         renderer.render();
         player.draw(game.batch);
         game.batch.end();
-        b2dr.render(world, gameCamera.combined);
+       // b2dr.render(world, gameCamera.combined);
 
         if (player.dead)
             deadTimer += delta;
         if (deadTimer >= 3) {
             game.setScreen(new GameOverScreen(game));
+        }
+        if (player.finished) {
+            game.setScreen( new Success(game));
         }
     }
 
@@ -148,6 +154,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         gamePort.update(width, height);
     }
+
 
     @Override
     public void pause() {

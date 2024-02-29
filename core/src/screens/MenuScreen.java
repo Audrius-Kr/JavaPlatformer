@@ -1,11 +1,11 @@
 package screens;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Matrix4;
 import com.mygdx.game.CatGame;
 
 public class MenuScreen implements Screen {
@@ -70,7 +70,8 @@ public class MenuScreen implements Screen {
         drawButtonWithHoverEffect(buttonX,editButtonY, editButton, editButtonHoover);
         drawButtonWithHoverEffect(buttonX,menuButtonY, menuButton, menuButtonHoover);
         game.batch.end();
-        onClickChangeScreen(buttonX, playButtonY);
+        onClickChangeScreen(buttonX, playButtonY, new GameScreen(this.game) );
+        onClickChangeScreen(buttonX, editButtonY, new MapEditor(this.game) );
 
 
     }
@@ -82,9 +83,9 @@ public class MenuScreen implements Screen {
         else
             game.batch.draw(buttonHover, x, y, buttonWidth, buttonHeight);
     }
-    void onClickChangeScreen(float x, float y) {
+    void onClickChangeScreen(float x, float y, Screen screen) {
         if ((mouseX > x && mouseX < x  + buttonWidth && mouseY > y && mouseY < y + buttonHeight) && Gdx.input.isTouched()) {
-            game.setScreen(new GameScreen(this.game));
+            game.setScreen(screen);
         }
     }
 

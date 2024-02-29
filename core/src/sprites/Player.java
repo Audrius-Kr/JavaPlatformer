@@ -1,23 +1,15 @@
 package sprites;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.game.CatGame;
-import jsonParse.ParseJson;
-import jsonParse.SpriteFrame;
 import screens.GameScreen;
 import utils.Constants;
 
-import java.util.List;
-
 import static com.mygdx.game.CatGame.CATEGORY_NOTHING;
-import static com.mygdx.game.CatGame.CATEGORY_PLAYER;
 import static utils.Constants.PlayerConstants.*;
 
 public class Player extends Entity {
@@ -30,9 +22,15 @@ public class Player extends Entity {
     public static final float PLAYER_SPEED_X = 1.0f;
     private int aniIndex;
     public boolean dead = false;
+    public boolean finished = false;
+    private boolean notMoving = false;
+    Music jump, playDead, finish;
 
     public Player(World world, float x, float y) {
         super(world, "2", x / CatGame.PPM, y / CatGame.PPM);
+        jump = Gdx.audio.newMusic(Gdx.files.internal("jump.wav"));
+        playDead = Gdx.audio.newMusic(Gdx.files.internal("dead.mp3"));
+
 
     }
 
@@ -42,7 +40,7 @@ public class Player extends Entity {
         if((b2body.getPosition().y < 0) && !dead){
             playerDead();
         }
-        if (!dead) {
+        if (!notMoving) {
             if (b2body.getLinearVelocity().y < 0 && previousStatus != JUMPING) {
                 previousStatus = playerStatus;
                 playerStatus = FALLING;
@@ -99,17 +97,23 @@ public class Player extends Entity {
         b2body.setLinearVelocity(velocity);
     }
     public void handleInput(float dt) {
-        if (!dead){
-            if ((Gdx.input.isKeyJustPressed(Input.Keys.UP)) && b2body.getLinearVelocity().y == 0)
+        if (!notMoving){
+            if ((Gdx.input.isKeyJustPressed(Input.Keys.UP)) && b2body.getLinearVelocity().y == 0) {
+                jump.play();
                 b2body.applyLinearImpulse(new Vector2(0, 4f), b2body.getWorldCenter(), true);
+            }
+
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && b2body.getLinearVelocity().x <= Player.PLAYER_SPEED_X)
                 b2body.applyLinearImpulse(new Vector2(1f, 0), b2body.getWorldCenter(), true);
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && b2body.getLinearVelocity().x >= -(Player.PLAYER_SPEED_X))
                 b2body.applyLinearImpulse(new Vector2(-1f, 0), b2body.getWorldCenter(), true);
         }
+
     }
         public void playerDead() {
+            playDead.play();
             this.dead = true;
+            this.notMoving = true;
             Filter filter = new Filter();
             filter.maskBits = CATEGORY_NOTHING;
             for (Fixture fixture : b2body.getFixtureList()){
@@ -117,9 +121,10 @@ public class Player extends Entity {
             }
             flip(false, true);
             b2body.applyLinearImpulse(new Vector2(0, 8f), b2body.getWorldCenter(), true);
-
-
-
+        }
+        public void playerFinished() {
+        this.finished = true;
+        this.notMoving = true;
         }
         public void setXVelocity (float velo){
             Vector2 velocity = b2body.getLinearVelocity();

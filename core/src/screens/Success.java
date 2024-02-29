@@ -1,33 +1,28 @@
 package screens;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.CatGame;
 
-public class GameOverScreen implements Screen {
+public class Success implements Screen {
     CatGame game;
     Texture deadImg, goMenuImg, pixmapImg;
     public  static final int DEAD_IMG_W = 512;
     public static final int DEAD_IMG_H = 256;
-    String GAME_OVER_IMG = "died.png";
+    String successImg = "success.png";
     String GO_MENU_IMG = "goMenu.png";
     Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 
 
-    public GameOverScreen(CatGame game) {
+    public Success(CatGame game) {
         this.game = game;
-        deadImg = new Texture(GAME_OVER_IMG);
+        deadImg = new Texture(successImg);
         goMenuImg = new Texture(GO_MENU_IMG);
         pixmapImg = new Texture(pixmap);
     }
@@ -38,9 +33,6 @@ public class GameOverScreen implements Screen {
     }
     private void update() {
         changeScreen();
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(new MenuScreen(this.game));
-        }
     }
 
     @Override
@@ -81,7 +73,7 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void resize(int i, int i1) {
-;
+        ;
     }
 
     @Override

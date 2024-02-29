@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import screens.GameScreen;
 import screens.MapEditor;
 import screens.MenuScreen;
+import screens.Success;
 
 public class CatGame extends Game {
 	public static final int SCREEN_WIDTH = 1280;
@@ -21,7 +22,7 @@ public class CatGame extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new MapEditor(this));
+		setScreen(new MenuScreen(this));
 	}
 	public static float getScreenWidth() {
 		return Gdx.graphics.getWidth();
